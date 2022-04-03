@@ -1,4 +1,4 @@
-# kessler
+# Kessler
 Source code and assets for the Ludum Dare 50 game "Kessler"
 
 This should contain everything needed to open and edit the game using Unity 2020.3.32f1
