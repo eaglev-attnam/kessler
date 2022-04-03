@@ -11,6 +11,7 @@ public class MainGame : MonoBehaviour
 	public GameObject pauseCanvas;
 	public GameObject baseSat;
 	public Text score;
+	public Text highScore;
 	
 	float lastLaunch = -launchSpacing;
 	float radius;
@@ -21,11 +22,15 @@ public class MainGame : MonoBehaviour
 	bool paused = false;
 	bool gameOver = false;
 	
+	GameObject keepOnScene;
+	
     // Start is called before the first frame update
     void Start()
     {
 		radius = baseSat.transform.position.magnitude;
 		startTime = Time.time;
+		keepOnScene = GameObject.FindWithTag("KeepOnScene");
+		keepOnScene.SendMessage("RequestTopScore", gameObject);
     }
 
     // Update is called once per frame
@@ -69,5 +74,11 @@ public class MainGame : MonoBehaviour
 		foreach(GameObject sattelite in GameObject.FindGameObjectsWithTag("Sattelite")) {
 			sattelite.SendMessage("Move", false);
 		}
+		keepOnScene.SendMessage("MaybeSetTopScore", Mathf.Round(Time.time - startTime));
+		keepOnScene.SendMessage("RequestTopScore", gameObject);
+	}
+	
+	void SetTopScore(int score) {
+		highScore.text = "Best: T+" + score;
 	}
 }

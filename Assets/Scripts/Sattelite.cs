@@ -21,6 +21,7 @@ public class Sattelite : MonoBehaviour
 	BoxCollider satCol;
 	Renderer satRen;
 	MeshFilter satFil;
+	ParticleSystem satPart;
 	
 	Transform launcher;
 	
@@ -32,6 +33,7 @@ public class Sattelite : MonoBehaviour
 		satCol = GetComponent<BoxCollider>();
 		satRen = GetComponent<Renderer>();
 		satFil = GetComponent<MeshFilter>();
+		satPart = GetComponent<ParticleSystem>();
 		
 		launcher = transform.Find("LaunchRotationPoint");
     }
@@ -76,35 +78,33 @@ public class Sattelite : MonoBehaviour
 			if(collisions == 0) {
 				// First collision
 				resolveCollision(broken, broken, new Vector3(0, -1.2f, 0),  new Vector3(2, 5, 2));
-				satCol.center = new Vector3(0, -1.2f, 0);
-				satCol.size = new Vector3(2, 5, 2);
 			} else if(lastCollision + collisionDelay < Time.time) {
 				if(collisions == maxCollisions) {
 					Destroy(gameObject);
 				} else {
 					resolveCollision(chunk[0], chunk[1],  new Vector3(0, 0, 0), new Vector3(2, 2, 2));
-					satCol.center = new Vector3(0, 0, 0);
-					satCol.size = new Vector3(2, 2, 2);
+					satRen.materials = new Material[]{satMats[0]};
 				}
 			}			
 		}
 	}
 	
 	void resolveCollision(Mesh selfMesh, Mesh otherMesh, Vector3 colliderCenter, Vector3 colliderSize) {
-			GameObject other = Instantiate(gameObject);
-			satCol.center = colliderCenter;
-			satCol.size = colliderSize;
-			other.GetComponent<BoxCollider>().center = colliderCenter;
-			other.GetComponent<BoxCollider>().size = colliderSize;
-			satFil.mesh = selfMesh;
-			other.GetComponent<MeshFilter>().mesh = otherMesh;
-			float rotation = Random.Range(-60,60);
-			other.transform.RotateAround(transform.position, transform.right, rotation);
-			transform.RotateAround(transform.position, transform.right, -rotation);
-			lastCollision = Time.time;
-			other.SendMessage("setCloneCollisionTime", lastCollision);
-			collisions++;
-			other.SendMessage("setCloneCollisions", collisions);
+		satPart.Play();
+		GameObject other = Instantiate(gameObject);
+		satCol.center = colliderCenter;
+		satCol.size = colliderSize;
+		other.GetComponent<BoxCollider>().center = colliderCenter;
+		other.GetComponent<BoxCollider>().size = colliderSize;
+		satFil.mesh = selfMesh;
+		other.GetComponent<MeshFilter>().mesh = otherMesh;
+		float rotation = Random.Range(-60,60);
+		other.transform.RotateAround(transform.position, transform.right, rotation);
+		transform.RotateAround(transform.position, transform.right, -rotation);
+		lastCollision = Time.time;
+		other.SendMessage("setCloneCollisionTime", lastCollision);
+		collisions++;
+		other.SendMessage("setCloneCollisions", collisions);
 	}
 	
 	public void Move(bool move) {
